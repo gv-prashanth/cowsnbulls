@@ -1,0 +1,520 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<title>Cows and Bulls</title>
+<link href="style.css" rel="stylesheet" type="text/css" media="screen" />
+<script language="JavaScript" src="scripts/masterlogic.js"></script>
+<script language="JavaScript" src="scripts/validation.js"></script>
+<script language="JavaScript" src="scripts/rtvalidator.js"></script>
+<script language="JavaScript" src="scripts/slider.js"></script>
+<script language="JavaScript" src="scripts/hslider.js"></script>
+<script type="text/javascript">
+var steps=0;
+var c=0;
+var t;
+var timer_is_on=0;
+var answer="";
+var opendiv="homediv";
+
+function main()
+	{
+		if(answer=="")
+		{
+			restarter();
+			generator();
+			doTimer();
+			document.getElementById("mainbtn").value="Check";
+			document.getElementById("remtxt").innerHTML = "Timer:";
+			enablethis('guessbox1');
+			enablethis('guessbox2');
+			enablethis('guessbox3');
+			enablethis('guessbox4');
+			enablethis('giveup');
+			}
+		else
+		{
+			var gn1 = document.getElementById('guessbox1').value;
+			var gn2 = document.getElementById('guessbox2').value;
+			var gn3 = document.getElementById('guessbox3').value;
+			var gn4 = document.getElementById('guessbox4').value;
+			if(totalvalidator(gn1,gn2,gn3,gn4))
+			{
+				var gn = gn1+gn2+gn3+gn4;
+				var hn= answer;
+				var cno = cowno(hn,gn);
+				var bno = bullno(hn,gn);
+				talk(cno,bno);
+				steps++;
+				if(steps<7)
+					{
+					var prev = document.getElementById("log1").innerHTML;
+					if(prev!="")
+					document.getElementById("log1").innerHTML = prev+"<br>"+gn1+" "+gn2+" "+gn3+" "+gn4+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"+cno+"<img src='images/smallcowart.gif' width='19px' height='19px'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"+bno+"<img src='images/smallbullart.gif' width='19px' height='19px'>";
+					else
+					document.getElementById("log1").innerHTML = gn1+" "+gn2+" "+gn3+" "+gn4+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"+cno+"<img src='images/smallcowart.gif' width='19px' height='19px'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"+bno+"<img src='images/smallbullart.gif' width='19px' height='19px'>";
+					}
+				else if(steps<13)
+					{
+					var prev = document.getElementById("log2").innerHTML;
+					if(prev!="")
+					document.getElementById("log2").innerHTML = prev+"<br>"+gn1+" "+gn2+" "+gn3+" "+gn4+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"+cno+"<img src='images/smallcowart.gif' width='19px' height='19px'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"+bno+"<img src='images/smallbullart.gif' width='19px' height='19px'>";
+					else
+					document.getElementById("log2").innerHTML = gn1+" "+gn2+" "+gn3+" "+gn4+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"+cno+"<img src='images/smallcowart.gif' width='19px' height='19px'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"+bno+"<img src='images/smallbullart.gif' width='19px' height='19px'>";
+					}
+				else if(steps<19)
+					{
+					var prev = document.getElementById("log3").innerHTML;
+					if(prev!="")
+					document.getElementById("log3").innerHTML = prev+"<br>"+gn1+" "+gn2+" "+gn3+" "+gn4+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"+cno+"<img src='images/smallcowart.gif' width='19px' height='19px'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"+bno+"<img src='images/smallbullart.gif' width='19px' height='19px'>";
+					else
+					document.getElementById("log3").innerHTML = gn1+" "+gn2+" "+gn3+" "+gn4+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"+cno+"<img src='images/smallcowart.gif' width='19px' height='19px'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"+bno+"<img src='images/smallbullart.gif' width='19px' height='19px'>";
+					}
+				if(bno==4){
+					var level="";
+					if(steps<7)
+					level="Expert"
+					else if(steps<13)
+					level="Intermediate"
+					else
+					level="Beginner"
+					var score = scoretell(steps,document.getElementById("txt").innerHTML);
+					var tim = document.getElementById("txt").innerHTML;
+					alert("Congratulations !! You solved the game \n \n Level: "+level+" \n \n Score: "+score+"\n \n Time: "+tim+" Sec \n \n Steps: "+steps);
+					stopCount();
+					restarter();
+				}
+			}
+			else
+			{
+				
+			}
+		}
+	}
+	
+function restarter()
+	{
+		document.getElementById("log1").innerHTML = "";
+		document.getElementById("log2").innerHTML = "";
+		document.getElementById("log3").innerHTML = "";
+		steps=0;
+		answer="";
+		stopCount();
+		c = 0;
+		document.getElementById("remtxt").innerHTML = "";
+		document.getElementById("txt").innerHTML = "";
+		document.getElementById("guessbox1").value = "";
+		document.getElementById("guessbox2").value = "";
+		document.getElementById("guessbox3").value = "";
+		document.getElementById("guessbox4").value = "";
+		document.getElementById("mainbtn").value="Start";
+		disablethis('guessbox1');
+		disablethis('guessbox2');
+		disablethis('guessbox3');
+		disablethis('guessbox4');
+		disablethis('giveup');
+		talk(5,5);
+	}
+	
+function giveup()
+	{
+		if(answer=="")
+			alert("Please start the game");
+		else
+		{
+			alert("Better Luck next time. \n \nThe answer is : "+answer);
+			restarter();
+		}
+	}
+	
+function showans()
+	{
+		alert(answer);
+	}
+
+function disablethis(elementid)
+	{
+	document.getElementById(elementid).disabled = true;
+	if(elementid=="giveup")
+	document.getElementById(elementid).className = 'restart_button_disable';
+	if(elementid=="guessbox1")
+		{
+		document.getElementById("guessbox1").className = 'inptboxcls_disable';
+		document.getElementById("guessbox2").className = 'inptboxcls_disable';
+		document.getElementById("guessbox3").className = 'inptboxcls_disable';
+		document.getElementById("guessbox4").className = 'inptboxcls_disable';
+		}
+	}
+	
+function enablethis(elementid)
+	{
+	document.getElementById(elementid).disabled = false;
+	if(elementid=="giveup")
+	document.getElementById(elementid).className = 'restart_button_enable';
+	if(elementid=="guessbox1")
+		{
+		document.getElementById("guessbox1").className = 'inptboxcls_enable';
+		document.getElementById("guessbox2").className = 'inptboxcls_enable';
+		document.getElementById("guessbox3").className = 'inptboxcls_enable';
+		document.getElementById("guessbox4").className = 'inptboxcls_enable';
+		}
+	}
+</script>
+
+<script type="text/javascript">
+
+function timedCount()
+	{
+		document.getElementById('txt').innerHTML=c;
+		c=c+1;
+		t=setTimeout("timedCount()",1000);
+	}
+
+function doTimer()
+	{
+		if (!timer_is_on)
+		  {
+			  timer_is_on=1;
+			  timedCount();
+		  }
+	}
+
+function stopCount()
+	{
+		clearTimeout(t);
+		timer_is_on=0;
+	}
+	
+</script>
+
+<script type="text/javascript">
+
+function totalslide(toopendiv)
+	{
+		if(toopendiv!=opendiv){
+		toplookchanger(opendiv, toopendiv);
+		slide(opendiv, this, 0, 500, 500);
+		slide(toopendiv, this, 880, 500, 500);
+		opendiv = toopendiv;}
+	}
+
+function toplookchanger(opendiv, toopendiv)
+	{
+		opendivli=opendiv+"li";
+		toopendivli=toopendiv+"li";
+		document.getElementById(opendivli).className = '';
+		document.getElementById(toopendivli).className = 'current_page_item';
+	}
+</script>
+
+<script type="text/javascript">
+
+function talk(cnos,bnos)
+	{
+	document.getElementById("ctalkimg").src = "images/talk/cchat"+cnos+".gif";
+	document.getElementById("btalkimg").src = "images/talk/bchat"+bnos+".gif";
+	var t1=setTimeout("document.getElementById('ctalkimg').src='images/talk/cchat5.gif'",2000);
+	var t2=setTimeout("document.getElementById('btalkimg').src='images/talk/bchat5.gif'",2000);
+	}
+
+</script>
+
+</head>
+<body>
+<div id="wrapper">
+	<div id="header">
+		<div id="logo">
+			<h1><a href="index.html">Cows <font color="#534226">&</font> Bulls</a></h1>
+		</div>
+	</div>
+
+	<div id="menu">
+		<ul>
+			<li id ="homedivli" class="current_page_item"><a onclick="totalslide('homediv');" style="cursor:pointer;">Home</a></li>
+			<li id ="gamedivli"><a onclick="totalslide('gamediv');" style="cursor:pointer;">Play</a></li>
+			<li id ="instructionsdivli"><a onclick="totalslide('instructionsdiv');" style="cursor:pointer;">Instructions</a></li>
+			<li id ="moredivli"><a onclick="totalslide('morediv');" style="cursor:pointer;">Scores</a></li>
+			<li id ="contactdivli"><a onclick="totalslide('contactdiv');" style="cursor:pointer;">Contact Us</a></li>
+		</ul>
+	</div>
+
+	<div id="page">
+		
+		
+
+		<div id="homediv" style="overflow:hidden; float:left;width:880px;height:500px;top:0px;left:0px;">
+		<div style="overflow:hidden; width:880px;">
+			<div id="content" style="width:880px; height:500px;">
+
+				<div class="post">
+				<h2 class="title">Welcome</h2>
+
+					<div class="entry" style="background: url(images/img20.jpg) no-repeat left top;">
+					<p><strong>Cows & Bulls</strong> is an interesting and entertaining code breaking or number finding game. It is one of the alternate versions of the Mastermind game. This is a game which tests your logical reasoning and your presence of mind. Not to mention, it is <strong>So much Fun</strong>. It is usually played between two players. This online version is designed to be played by a single player. The aim of the game is to find the secret (4 digit) number chosen by the computer, in as few guesses as possible.</p>
+					<p>As you start guessing the digits one by one, the computer throws the number of bulls and cows for each numer until you hit 4 bulls (i.e all digits in right position), or you run out of attempts allowed. All the Best and have fun !!!</p>
+					<p>
+					<strong>Rules</strong> of game are pretty simple. Please go through the instrunction page for full details regarding how to play the game.
+					<ul style="padding-left:30px;">
+					<li>1) You can only guess four digit numbers.</li>
+					<li>2) The digits cannot repeat.</li>
+					<li>3) You cannot take back a turn.</li>	
+					<li>4) The number cannot start with 0, but can have 0 in other positions.</li>
+					</ul>
+					</p>
+					</div>
+				</div>
+			</div>
+		</div>
+		</div>
+		
+		
+		
+		
+		<div id="gamediv" style="overflow:hidden; float:left;width:0px;height:500px;top:0px;left:0px;">
+		<div style="overflow:hidden; width:880px;">
+		
+			<div id="content" style="height:500px; width:880px;">
+
+				<div class="post" style="height:310px;">
+				<h2 class="title">Play</h2>
+
+				<div class="entry" style="background: url(images/img20.jpg) no-repeat left top;">
+
+							<div class="cowsnbulls" style="float: left;">
+							
+							
+							<div style="width: 200px; height: 25px">
+							</div>
+							<div style="width: 200px; height: 100px">
+							</div>							
+							
+							<div>
+							<img align="right" id="ctalkimg" src="images/talk/cchat5.gif" width="73px" height="60px">
+							</div>
+							<div>
+							<a onmousedown="toggleSlide('mydiv');" style="cursor:pointer;"><img align="left" src="images/cowart.jpg" width="121px" height="118px"></a>
+							</div>
+							</div>
+
+						<center>
+							<div class="bj_inputs" style="float: left; width: 480px;">
+							<p>
+							<input class="inptboxcls_disable" type="text" name="guess_number1" id="guessbox1"  maxlength=1 size=1 disabled onKeyPress="return numbersonlyfirst(this, event)" TABINDEX=1/>
+							<input class="inptboxcls_disable" type="text" name="guess_number2" id="guessbox2"  maxlength=1 size=1 disabled onKeyPress="return numbersonly(this, event, 'guessbox2')" TABINDEX=2/>
+							<input class="inptboxcls_disable" type="text" name="guess_number3" id="guessbox3"  maxlength=1 size=1 disabled onKeyPress="return numbersonly(this, event, 'guessbox3')" TABINDEX=3/>
+							<input class="inptboxcls_disable" type="text" name="guess_number4" id="guessbox4"  maxlength=1 size=1 disabled onKeyPress="return numbersonly(this, event, 'guessbox4')" TABINDEX=4/>
+							</p>
+								<div class="play_buttons">
+								<input class="start_button" type="button" name="start" value="Start"  onclick="main();" id="mainbtn" TABINDEX=5 />
+								<input class="restart_button_disable" type="button" name="start" value="Restart"  onclick="giveup();" id="giveup" disabled />
+								
+								</div>
+							</div>
+						</center>
+						
+							<div class="cowsnbulls" style="float: right;">
+							<div style="width: 200px; height: 25px">
+							<div id="remtxt" style="width: 150px; height: 25px; float:left; font-size:20px; text-align: right;">
+							</div>
+							<div id="txt" class="timerclass" style="width: 40px; height: 25px; float:left; font-size:20px; margin-left:10px;">
+							</div>
+							</div>
+							<div style="width: 200px; height: 100px">
+							</div>
+							
+							<div>
+							<img align="left" id="btalkimg" src="images/talk/bchat5.gif" width="73px" height="60px">
+							</div>
+							<div>
+							<a onmousedown="toggleSlide('mydiv');" style="cursor:pointer;"><img align="right" src="images/bullart.jpg" width="121px" height="118px"></a>
+							</div>
+							</div>
+				</div>
+				</div>
+<div style="height:160px;">
+<div id="mydiv" style="overflow:hidden; height:160px;">
+<div id="banner" style="font-size:18px; height:140px; width:250px; float:left; background-image: url('images/try3.jpg');">
+<center><div ID="log1"></div></center>
+</div>
+<div style="height:133px; width:330px; float:left;">
+<center>
+<div id="banner" style="font-size:18px; height:140px; width:250px; background-image: url('images/try2.jpg');">
+<div ID="log2"></div>
+</div>
+</center>
+</div>
+<div id="banner" style="font-size:18px; height:140px; width:250px; float:right; background-image: url('images/try.jpg');">
+<center><div ID="log3"></div></center>
+</div>
+</div>
+</div>
+<div style="font-size:14px; width:880px;">* Click on cow or bull to toggle Guess history display.</div>
+			</div>		
+		</div>
+		</div>
+		
+		<div id="instructionsdiv" style="overflow:hidden; float:left;width:0px;height:500px;top:0px;left:0px;">
+		<div style="overflow:hidden; width:880px;">
+		<div id="content" style="height:500px; width:880px;">
+		<div class="post">
+				<h2 class="title">Instructions</h2>
+
+					<div class="entry" style="background: url(images/img20.jpg) no-repeat left top;">
+					<p>The computer holds a 4 digit number (let's call it the 'target number') and you start guessing 4 digit numbers one by one towards the aim of finding the target number.
+
+When you guess a number, the computer responds back with the number of Cows and Bulls in the number you guessed.
+
+Any digit in your guessed number which is also present in the targer number is a <strong>Cow</strong> or a <strong>Bull</strong>.</p>
+
+<p>If the digit is in the same position as in the target number, then it is called a <strong>Bull</strong> and if it is not in the same position in the target number, it is called a <strong>Cow</strong>.</p>
+
+<p>
+<strong>Examples</strong>
+<ul style="padding-left:30px;">
+<li>1) If the target number is '8049' and you entered '1465' then the number of cows in this case is 1. Since 4 and 4 match but not in position. Number of bulls is 0. Since no exact match is present.</li>
+<li>2) If the target number is '8049' and you entered '1645' then the number of cows in this case is 0. Number of Bulls is 1. Since 4 and 4 match in digit and position.</li>
+<li>3) If the target number is '8049' and you entered '1648' then the number of cows in this case is 1. Number of Bulls is 1.</li>
+</ul>
+</p>
+					</div>
+				</div>
+			</div>
+		</div>
+		</div>
+
+		<div id="morediv" style="overflow:hidden; float:left;width:0px;height:500px;top:0px;left:0px;">
+		<div style="overflow:hidden; width:880px;">
+		<div id="content" style="height:500px; width:880px;">
+		<div class="post">
+				<h2 class="title">Top Scores</h2>
+
+					<div class="entry" style="background: url(images/img20.jpg) no-repeat left top;">
+					<p>
+					
+					
+					<div id="getbyajaxdiv" style="font-size:16px;text-align:center;">
+					<table class="log_table" width="100%" border="0" cellpadding="8" cellspacing="4">
+						<tr>
+							<th><strong>Rank</strong></th>
+							<th><strong>Nick /  Name</strong></th>
+							<th><strong>Score</strong></th>
+							<th><strong>Time</strong></th>
+						</tr>
+						<tr>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+						</tr>
+						<tr>
+							<td>1</td>
+							<td>Vader</td>
+							<td>3014</td>
+							<td>5</td>
+						</tr>
+						<tr>
+							<td>2</td>
+							<td>Prashanth</td>
+							<td>2056</td>
+							<td>7</td>
+						</tr>
+						<tr>
+							<td>3</td>
+							<td>Rincey</td>
+							<td>1527</td>
+							<td>8</td>
+						</tr>
+						<tr>
+							<td>4</td>
+							<td>Krishna</td>
+							<td>1027</td>
+							<td>15</td>
+						</tr>
+						<tr>
+							<td>5</td>
+							<td>Ciddu</td>
+							<td>1007</td>
+							<td>21</td>
+						</tr>
+						<tr>
+							<td>6</td>
+							<td>Magma</td>
+							<td>912</td>
+							<td>22</td>
+						</tr>
+						<tr>
+							<td>7</td>
+							<td>Flora</td>
+							<td>857</td>
+							<td>21</td>
+						</tr>
+						<tr>
+							<td>8</td>
+							<td>lolgusser</td>
+							<td>819</td>
+							<td>27</td>
+						</tr>
+						<tr>
+							<td>9</td>
+							<td>test</td>
+							<td>715</td>
+							<td>29</td>
+						</tr>
+					</table>
+					
+					</div>
+					
+					
+					</p>
+					</div>
+				</div>
+			</div>
+		</div>
+		</div>
+		
+		<div id="contactdiv" style="overflow:hidden; float:left;width:0px;height:500px;top:0px;left:0px;">
+		<div style="overflow:hidden; width:880px;">
+		<div id="content" style="height:500px; width:880px;">
+		<div class="post">
+				<h2 class="title">Contact Us</h2>
+
+					<div class="entry" style="background: url(images/img20.jpg) no-repeat left top;">
+					<p>This web application is developed as a <strong>Human Computer Interaction</strong> project by us at BITS-Pilani Goa. We would like to thank our instructor <strong>Mr.Mangesh Bedekar</strong> for giving us this opportunity to develop this web application. We would also like to thank our friends for testing and giving us their valuable feedback.</p>
+					<p>Here is our contact info</p>
+					<p><strong>G V Prashanth</strong><br>
+					B.E(Hons.) Computer Science - Bits-Pilani,goa<br>
+					gvprashanth.bits@gmail.com
+					</p>
+					<p><strong>B J Krishna</strong><br>
+					B.E(Hons.) Computer Science - Bits-Pilani,goa<br>
+					bjkrishna.bits@gmail.com
+					</p>
+					<p>If you liked this website then chances are that you will love our Personal website too, check it out at <a href="http://www.gvprashanth.comuf.com">Vadrin</a>.</p>
+					</div>
+				</div>
+			</div>
+		</div>
+		</div>
+
+		
+		
+		
+		
+		
+		<div style="clear: both;">&nbsp;</div>
+	</div>
+
+</div>
+<div id="footer-content">
+
+	<center>
+	<div class="column1">
+
+		<p><strong>&copy; 2010 Design by <a href="http://www.gvprashanth.comuf.com/">G.V.Prashanth</a> and <a href="http://www.gvprashanth.comuf.com/">B.J.Krishna</a>.</strong></p>
+	</div>
+	</center>
+
+</div>
+</body>
+</html>
